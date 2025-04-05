@@ -17,7 +17,7 @@ func database() {
 
     fmt.Println("Connected to Database!")
 
-    // 'product' tablosunu kontrol edip oluşturma
+   
     query := `
         CREATE TABLE IF NOT EXISTS product (
             id INT AUTO_INCREMENT PRIMARY KEY,
