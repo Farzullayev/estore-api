@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"net/http"
 
+	"api/connection"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
-	"api/connection"
 )
 
 func Getproduct(c *gin.Context) {
