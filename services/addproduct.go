@@ -1,11 +1,13 @@
 package services
 
 import (
-	"net/http"
 	"api/connection"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql" 
+	_ "github.com/go-sql-driver/mysql"
 )
+
 func Addproduct(c *gin.Context) {
 	type Product struct {
 		Name  string  `json:"name" binding:"required"`
@@ -26,10 +28,15 @@ func Addproduct(c *gin.Context) {
 	defer db.Close()
 	query := "INSERT INTO product (name, price, stock) VALUES (?, ?, ?)"
 	result, err := db.Exec(query, newProduct.Name, newProduct.Price, newProduct.Stock)
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert product"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to insert product",
+			"details": err.Error(),
+		})
 		return
 	}
+
 	lastInsertID, err := result.LastInsertId()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve last insert ID"})
@@ -41,5 +48,4 @@ func Addproduct(c *gin.Context) {
 		"product": newProduct,
 		"id":      lastInsertID,
 	})
-	//fmt.Printf("Inserted Product ID: %d\n", lastInsertID)
 }

@@ -1,23 +1,15 @@
 package services
 
 import (
+	"api/connection"
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
-	"api/connection"
 )
 
 func Deleteproduct(c *gin.Context) {
-	type Product struct {
-		Id int `json:"id" binding:"required"`
-	}
-
-	var remProduct Product
-
-	if err := c.ShouldBindJSON(&remProduct); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	idParam := c.Param("id")
 
 	db, err := connection.Mysql()
 	if err != nil {
@@ -27,7 +19,7 @@ func Deleteproduct(c *gin.Context) {
 	defer db.Close()
 
 	query := "DELETE FROM product WHERE id = ?"
-	result, err := db.Exec(query, remProduct.Id)
+	result, err := db.Exec(query, idParam)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
 		return
@@ -38,5 +30,5 @@ func Deleteproduct(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Product removed successfully!", "product": remProduct})
+	c.JSON(http.StatusOK, gin.H{"message": "Product removed successfully!", "product_id": idParam})
 }

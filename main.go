@@ -2,10 +2,10 @@ package main
 
 import (
 	_ "api/connection"
-	"api/services"
+	"api/routes"
 	"database/sql"
 	"fmt"
-	"github.com/gin-gonic/gin"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -36,13 +36,14 @@ func database() {
 
 func main() {
 	database()
-	r := gin.Default()
-	r.GET("/ping", services.Ping)
-	r.POST("/addproduct", services.Addproduct)
-	r.DELETE("/deleteproduct", services.Deleteproduct)
-	r.GET("/getproduct", services.Getproduct)
-	r.POST("/addstock", services.Addstock)
-	r.POST("/login", services.Login)
-	r.Run()
+
+	routes.Routes()
+	//r.GET("/ping", services.Ping)
+	//r.POST("/addproduct", services.Addproduct)
+	////r.GET("/product/:id", services.Product)
+	//r.DELETE("/deleteproduct", services.Deleteproduct)
+	///r.POST("/addstock", services.Addstock)
+	//	r.POST("/login", services.Login)
+	//r.Run()
 
 }
