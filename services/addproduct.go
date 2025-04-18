@@ -2,6 +2,7 @@ package services
 
 import (
 	"api/connection"
+	"database/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,24 +11,39 @@ import (
 
 func Addproduct(c *gin.Context) {
 	type Product struct {
-		Name  string  `json:"name" binding:"required"`
-		Price float64 `json:"price" binding:"required"`
-		Stock int     `json:"stock" binding:"required"`
+		Name     string  `json:"name" binding:"required"`
+		Category string  `json:"category" binding:"required"`
+		Price    float64 `json:"price" binding:"required"`
+		Stock    int     `json:"stock" binding:"required"`
 	}
 
 	var newProduct Product
+
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	db, err := connection.Mysql()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection failed"})
 		return
 	}
 	defer db.Close()
-	query := "INSERT INTO product (name, price, stock) VALUES (?, ?, ?)"
-	result, err := db.Exec(query, newProduct.Name, newProduct.Price, newProduct.Stock)
+
+	var categoryName string
+	err = db.QueryRow("SELECT name FROM category WHERE name = ?", newProduct.Category).Scan(&categoryName)
+
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Category does not exist"})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check category"})
+		return
+	}
+
+	query := "INSERT INTO product (name, category, price, stock) VALUES (?, ?, ?, ?)"
+	result, err := db.Exec(query, newProduct.Name, newProduct.Category, newProduct.Price, newProduct.Stock)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

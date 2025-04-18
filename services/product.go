@@ -19,7 +19,6 @@ func Product(c *gin.Context) {
 		return
 	}
 
-	// DB bağlantısı
 	db, err := connection.Mysql()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection failed"})
@@ -27,7 +26,6 @@ func Product(c *gin.Context) {
 	}
 	defer db.Close()
 
-	// Ürün sorgusu
 	query := "SELECT id, name, price, stock FROM product WHERE id = ?"
 	row := db.QueryRow(query, id)
 
@@ -49,7 +47,6 @@ func Product(c *gin.Context) {
 		return
 	}
 
-	// Başarılı yanıt
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Product found successfully!",
 		"product": product,
